@@ -3,6 +3,14 @@ import random
 
 difficulty = "facile" # Les valeurs possibles : "facile", "moyen", "difficile"
 
+scores = {"X": 0, "O": 0}
+
+def set_random_start_player():
+    global current_player
+    current_player = random.choice(["X", "O"])
+    message_label.config(text=f"Le joueur {current_player} commence !")
+
+
 def check_nul():
     global win
     if win:  # Si la partie est déjà terminée, ne rien faire
@@ -24,6 +32,8 @@ def print_winner():
     global win
     if win is False:
         win = True
+        scores[current_player] += 1
+        score_label.config(text=f"Scores - X: {scores['X']} | O: {scores['O']}")
         message_label.config(text=f"Le joueur {current_player} a gagné la partie.")
 
 def switch_player():
@@ -32,6 +42,7 @@ def switch_player():
         current_player = "O"
     else:
         current_player = "X"
+        
 
 def check_win(clicked_row, clicked_col):
     # Vérifie les conditions de victoire
@@ -77,7 +88,14 @@ def reset_game():
         for row in range(3):
             buttons[col][row].config(text="")
     win = False
-    current_player = "X"
+
+    # Détermine le joueur qui commence aléatoirement
+    set_random_start_player()
+
+    # Si c'est au tour de l'IA de commencer, elle joue immédiatement
+    if vs_ai and current_player == "O":
+        ia_move()
+
     message_label.config(text="")
 
 def draw_grid():
@@ -232,6 +250,12 @@ def set_difficulty(new_difficulty):
     difficulty_label.config(text=f"Difficulté : {new_difficulty.capitalize()}")
     reset_game()
 
+def reset_scores():
+    global scores
+    scores = {"X": 0, "O": 0}
+    score_label.config(text=f"Scores - X: {scores['X']} | O: {scores['O']}")
+
+
 
 # Stockages
 buttons = []
@@ -243,6 +267,10 @@ vs_ai = True  # Mode contre IA activé par défaut
 root = tkinter.Tk()
 root.title("Jeu du morpion")
 root.minsize(500, 500)
+
+# Score des joueurs
+score_label = tkinter.Label(root, text=f"Scores - X: {scores['X']} | O: {scores['O']}", font=("Arial", 14))
+score_label.grid(row=10, column=0, columnspan=3)
 
 # Bouton pour réinitialiser le jeu
 reset_button = tkinter.Button(root, text="Réinitialiser", command=reset_game)
@@ -269,6 +297,16 @@ tkinter.Button(root, text="Facile", bg="green", fg="white", command=lambda: set_
 tkinter.Button(root, text="Moyen", bg="orange", fg="white", command=lambda: set_difficulty("moyen")).grid(row=9, column=1)
 tkinter.Button(root, text="Difficile", bg="red", fg="white", command=lambda: set_difficulty("difficile")).grid(row=9, column=2)
 
+# Bouton pour réinitialiser les scores
+tkinter.Button(root, text="Réinitialiser les scores", command=reset_scores).grid(row=11, column=1)
+
+# Grille de jeu
 draw_grid()
+
+# Détermine le joueur qui commence pour la première partie
+set_random_start_player()
+
+# Lancement de l'interface
 root.mainloop()
+
 
