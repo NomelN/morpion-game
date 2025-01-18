@@ -25,16 +25,17 @@ def check_nul():
 
     if count == 9:  # Si toutes les cases sont remplies et pas de gagnant
         win = True  # Marque la fin de la partie
-        message_label.config(text="Match nul")
+        show_end_game_message("Match nul !")
+
 
 
 def print_winner():
     global win
-    if win is False:
+    if not win:
         win = True
         scores[current_player] += 1
         score_label.config(text=f"Scores - X: {scores['X']} | O: {scores['O']}")
-        message_label.config(text=f"Le joueur {current_player} a gagné la partie.")
+        show_end_game_message(f"Le joueur {current_player} a gagné la partie !")
 
 def switch_player():
     global current_player
@@ -97,6 +98,25 @@ def reset_game():
         ia_move()
 
     message_label.config(text="")
+
+def show_end_game_message(message):
+    # Crée une nouvelle fenêtre (popup)
+    popup = tkinter.Toplevel(root)
+    popup.title("Fin de partie")
+    popup.geometry("300x200")
+    
+    # Ajoute le message de fin de partie
+    label = tkinter.Label(popup, text=message, font=("Arial", 14), pady=20)
+    label.pack()
+
+    # Ajoute un bouton Réinitialiser
+    reset_button = tkinter.Button(popup, text="Réinitialiser", command=lambda: [reset_game(), popup.destroy()])
+    reset_button.pack(pady=20)
+
+    # Empêche d'interagir avec la fenêtre principale tant que le popup est ouvert
+    popup.transient(root)
+    popup.grab_set()
+
 
 def draw_grid():
     for column in range(3):
